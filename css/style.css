@@ -24,7 +24,7 @@ body {
 	color:#fff;
 	position: absolute;
 	right:20px;
-	top:20px;
+	top:35px;
 	display: none;
 }
 
@@ -40,7 +40,7 @@ header {
 }
 
 header.headroom--unpinned {
-	top:-50px;
+	top:-75px;
 }
 
 header.headroom--unpinned:hover {
@@ -155,7 +155,7 @@ header .mainnav li {
 }
 
 .packshot {
-	width: 50%;
+	width: 70%;
 	max-width: 700px;
 	display: inline-block;
 }
@@ -167,7 +167,7 @@ header .mainnav li {
 .home-info {
   display: inline-block;
   vertical-align: middle;
-  width: calc(50% - 25px);
+  width: calc(30% - 25px);
   max-width: 700px;
   padding: 10px;
 }
