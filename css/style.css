@@ -12,6 +12,7 @@ body {
 	border:0px solid #263F43;
 	font-family: 'Ubuntu', sans-serif;;
 	color:#263F43;
+	background-color: #1EB8BC;
 }
 
 .container {
@@ -32,7 +33,7 @@ header {
 	position: fixed;
 	top:0;
 	width: 100%;
-	background: #263F43;
+	background: #F9E736;
 	color:#fff;
 	z-index: 5;
 	padding:30px 0px;
@@ -53,7 +54,7 @@ header.headroom--unpinned:hover {
 }
 
 header a {
-	color:#fff;
+	color:#3D5659;
 	text-decoration: none;
 }
 
@@ -155,7 +156,7 @@ header .mainnav li {
 }
 
 .packshot {
-	width: 70%;
+	width: 40%;
 	max-width: 700px;
 	display: inline-block;
 }
@@ -415,6 +416,18 @@ header .mainnav li {
 
 /** insta **/
 
+#instagram {
+	margin:0;
+	padding:0;
+	overflow:hidden;
+}
+
+#instagram li {
+	list-style:none;
+	float:left;
+	margin:0 20px 20px 0;
+}
+
 #photos {
 	text-align: center;
 	margin: auto;
@@ -422,18 +435,6 @@ header .mainnav li {
 	max-width: 1200px;
 	padding: 50px 0px;
 	border-bottom: 30px solid #263F43;
-}
-
-#instagram {
-	padding:0px;
-	margin:0px;
-}
-
-#instagram li {
-	display:inline-block;
-	margin:10px;
-	width:calc(25% - 24px);
-	cursor: pointer;
 }
 
 #instagram li img {

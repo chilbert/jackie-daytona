@@ -29,7 +29,7 @@
  * Version: 1.0
  * Copyright: Crafted Pixelz
  * License: MIT license
- * Updated: 1st January 2012
+ * Updated: 26th April 2013
 */
 
 (function ($) {
@@ -54,17 +54,12 @@
             $.getJSON(url, function(data){
                 $.each(data.data, function (i, val) {
                     var li = $("<li/>").appendTo(elem),
-                        img = $("<img/>", {"src": val.images.standard_resolution.url, "class":"instapic"}).appendTo(li);
+                        a = $("<a/>", {"href": val.link, "target": "_blank"}).appendTo(li),
+                        img = $("<img/>", {"src": val.images.thumbnail.url}).appendTo(a);
 
-                    img.click(function() {
-                      $('#lightbox').addClass('active');
-                      $('#lightbox .lbox').remove();
-                      $("<img/>", {"src": val.images.standard_resolution.url, "class":"lbox"}).appendTo('#lightbox');
-                    });
-                    $('#lightbox').click(function() {
-                      $(this).removeClass('active');
-                      $('#lightbox .lbox').remove();
-                    });
+                    if (val.caption){
+                        a.attr("title", val.caption.text);
+                    }
                 });
             });
 
@@ -78,6 +73,6 @@
 
 $("#instagram").jqinstapics({
   "user_id": "3558165251",
-  "access_token": "3558165251.1677ed0.8b081b47419846e082ca69beed0b2c6f",
-  "count": 20
+  "access_token": "3558165251.674061d.ccf3b591242b45369f63226db9cfa067",
+  "count": 28
 });
