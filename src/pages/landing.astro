@@ -1,0 +1,33 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Newsletter from '../components/Newsletter.astro';
+import logo from '../assets/logo-full.png';
+---
+
+<Base title="Jackie Daytona" description="New single - Comin' To Get You" minimal>
+  <section class="landing">
+    <a href="/" aria-label="Jackie Daytona home">
+      <Image src={logo} alt="Jackie Daytona" widths={[400, 800, 1200]} sizes="(max-width: 700px) 90vw, 560px" loading="eager" class="logo" />
+    </a>
+    <Newsletter heading="Comin' To Get You" blurb="Sign up for the newsletter to stay up to date with the launch of the new single." />
+  </section>
+</Base>
+
+<style>
+  .landing {
+    display: grid;
+    place-items: center;
+    gap: 3rem;
+    min-height: 90svh;
+    padding: 4rem var(--gutter);
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 0%, color-mix(in srgb, var(--teal) 20%, transparent), transparent 70%),
+      radial-gradient(ellipse 60% 50% at 50% 110%, color-mix(in srgb, var(--pink) 25%, transparent), transparent 70%);
+  }
+
+  .logo {
+    width: min(100%, 560px);
+    filter: drop-shadow(0 20px 50px color-mix(in srgb, var(--pink) 35%, transparent));
+  }
+</style>
