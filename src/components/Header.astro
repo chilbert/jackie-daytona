@@ -1,0 +1,280 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import logo from '../assets/logo-header.png';
+import { social } from '../data/site';
+
+const nav = [
+  { label: 'Listen', href: '/#listen' },
+  { label: 'The Album', href: '/#album' },
+  { label: 'Buy', href: '/#buy' },
+  { label: 'Booking', href: '/#booking' },
+  { label: 'Newsletter', href: '/#newsletter' },
+];
+---
+
+<header class="header" data-header>
+  <div class="bar">
+    <a href="/#top" class="brand" aria-label="Jackie Daytona home">
+      <Image src={logo} alt="" width={84} loading="eager" />
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <ul class="links">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="social">
+        {
+          social.slice(0, 3).map((s) => (
+            <li>
+              <a href={s.href} target="_blank" rel="noopener" aria-label={s.name}>
+                <Icon name={s.icon} size={18} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <button class="toggle" aria-controls="site-nav" aria-expanded="false" data-toggle>
+      <span class="sr-only">Menu</span>
+      <span class="burger" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const toggle = header.querySelector<HTMLButtonElement>('[data-toggle]')!;
+
+  const setOpen = (open: boolean) => {
+    header.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+  };
+
+  toggle.addEventListener('click', () => setOpen(!header.classList.contains('open')));
+  header.querySelectorAll('.nav a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+
+  // Solid background once scrolled; slide away when scrolling down, back when scrolling up.
+  let lastY = scrollY;
+  addEventListener(
+    'scroll',
+    () => {
+      const y = scrollY;
+      header.classList.toggle('scrolled', y > 40);
+      if (!header.classList.contains('open')) header.classList.toggle('hidden', y > lastY && y > 400);
+      lastY = y;
+    },
+    { passive: true },
+  );
+</script>
+
+<style>
+  .header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    transition:
+      transform 0.4s var(--ease),
+      background 0.3s,
+      backdrop-filter 0.3s;
+  }
+
+  .header.scrolled {
+    background: color-mix(in srgb, var(--ink) 78%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--cream) 8%, transparent);
+  }
+
+  .header.hidden {
+    transform: translateY(-100%);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: min(100% - 2 * var(--gutter), 1400px);
+    height: 4.5rem;
+    margin-inline: auto;
+  }
+
+  .brand {
+    flex: none;
+    transition: transform 0.3s var(--ease);
+  }
+
+  .brand:hover {
+    transform: rotate(-4deg) scale(1.05);
+  }
+
+  .nav {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav ul {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links {
+    gap: 0.25rem;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.5em 0.85em;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+
+  .links a:hover {
+    background: color-mix(in srgb, var(--cream) 10%, transparent);
+  }
+
+  .social {
+    gap: 0.25rem;
+  }
+
+  .social a {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    transition:
+      color 0.2s,
+      background 0.2s;
+  }
+
+  .social a:hover {
+    color: var(--teal);
+    background: color-mix(in srgb, var(--teal) 12%, transparent);
+  }
+
+  .toggle {
+    display: none;
+  }
+
+  @media (max-width: 960px) {
+    .toggle {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      margin-left: auto;
+      border: 0;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--cream) 10%, transparent);
+      color: var(--cream);
+      cursor: pointer;
+    }
+
+    .burger,
+    .burger::before,
+    .burger::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      transition:
+        transform 0.3s var(--ease),
+        background 0.2s;
+    }
+
+    .burger {
+      position: relative;
+    }
+
+    .burger::before,
+    .burger::after {
+      content: '';
+      position: absolute;
+      left: 0;
+    }
+
+    .burger::before {
+      top: -6px;
+    }
+
+    .burger::after {
+      top: 6px;
+    }
+
+    .open .burger {
+      background: transparent;
+    }
+
+    .open .burger::before {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .open .burger::after {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .nav {
+      position: fixed;
+      inset: 0;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2.5rem;
+      padding: 5rem var(--gutter) 2rem;
+      background: radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--pink) 25%, transparent), transparent 50%),
+        var(--ink);
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.3s,
+        visibility 0.3s;
+    }
+
+    .open .nav {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .links {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .links a {
+      font-family: var(--display);
+      font-size: clamp(2rem, 9vw, 3rem);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    .social a {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+</style>

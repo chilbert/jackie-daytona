@@ -1,0 +1,30 @@
+---
+import { siApplemusic, siBandcamp, siFacebook, siInstagram, siSpotify, siX, siYoutube } from 'simple-icons';
+
+const paths = {
+  applemusic: siApplemusic.path,
+  bandcamp: siBandcamp.path,
+  facebook: siFacebook.path,
+  instagram: siInstagram.path,
+  spotify: siSpotify.path,
+  x: siX.path,
+  youtube: siYoutube.path,
+  music: 'M21 3v12.5a3.5 3.5 0 1 1-2-3.16V7.4L9 9.6v7.9A3.5 3.5 0 1 1 7 14.34V5l14-2Z',
+  download: 'M11 3h2v9.6l3.3-3.3 1.4 1.4L12 16.4l-5.7-5.7 1.4-1.4 3.3 3.3V3ZM4 18h16v3H4v-3Z',
+  mail: 'M2 5h20v14H2V5Zm2.4 2L12 12.2 19.6 7H4.4ZM20 8.7l-8 5.5-8-5.5V17h16V8.7Z',
+  arrow: 'M13.2 5.3 19.9 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.1l-4.3-4.3 1.4-1.4Z',
+  play: 'M8 5v14l11-7L8 5Z',
+} as const;
+
+interface Props {
+  name: keyof typeof paths;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 20, class: className } = Astro.props;
+---
+
+<svg class={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d={paths[name]} />
+</svg>

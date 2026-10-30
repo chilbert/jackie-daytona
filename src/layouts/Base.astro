@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { album, site, social } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  minimal?: boolean;
+}
+
+const { title = `${site.name} | ${album.title}`, description = site.description, minimal = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og.jpg', Astro.site);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicGroup',
+  name: site.name,
+  url: Astro.site?.href,
+  sameAs: social.map((s) => s.href),
+  album: {
+    '@type': 'MusicAlbum',
+    name: album.title,
+    datePublished: String(album.year),
+    image: ogImage.href,
+    numTracks: album.tracks.length,
+  },
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#0d1517" />
+
+    <meta property="og:type" content="music.album" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-196x196.png" sizes="196x196" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-152x152.png" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    {
+      site.gaId && (
+        <>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${site.gaId}`} />
+          <script is:inline define:vars={{ gaId: site.gaId }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', gaId);
+          </script>
+        </>
+      )
+    }
+    {
+      site.metaPixelId && (
+        <script is:inline define:vars={{ pixelId: site.metaPixelId }}>
+          !(function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+              n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = '2.0';
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s);
+          })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', pixelId);
+          fbq('track', 'PageView');
+        </script>
+      )
+    }
+  </head>
+  <body>
+    {!minimal && <Header />}
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

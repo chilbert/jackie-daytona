@@ -1,0 +1,145 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+interface Props {
+  heading?: string;
+  blurb?: string;
+}
+
+const {
+  heading = 'Get on the list',
+  blurb = 'New music, shows and the occasional hot & sweaty update. No spam, ever.',
+} = Astro.props;
+const { action, u, id } = site.mailchimp;
+---
+
+<div class="newsletter reveal">
+  <h2 class="title">{heading}</h2>
+  <p class="lede">{blurb}</p>
+
+  <form class="form" action={`${action}?u=${u}&id=${id}`} method="post" target="_blank" data-mailchimp>
+    <label class="sr-only" for="nl-email">Email address</label>
+    <input id="nl-email" type="email" name="EMAIL" placeholder="you@example.com" autocomplete="email" required />
+    <!-- Mailchimp bot trap: real people leave this empty -->
+    <div class="sr-only" aria-hidden="true">
+      <input type="text" name={`b_${u}_${id}`} tabindex="-1" value="" />
+    </div>
+    <button class="btn" type="submit">Subscribe <Icon name="arrow" size={18} /></button>
+  </form>
+  <p class="status" role="status" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  // Submit to Mailchimp's JSONP endpoint so people stay on the page.
+  // Without JS the form falls back to a normal post in a new tab.
+  document.querySelectorAll<HTMLFormElement>('[data-mailchimp]').forEach((form) => {
+    const status = form.parentElement!.querySelector<HTMLElement>('[data-status]')!;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const button = form.querySelector('button')!;
+      const cb = `mc_${Date.now()}`;
+      const params = new URLSearchParams(new FormData(form) as unknown as Record<string, string>);
+      params.set('c', cb);
+      const url = new URL(form.action.replace('/post?', '/post-json?'));
+      params.forEach((v, k) => url.searchParams.set(k, v));
+
+      const script = document.createElement('script');
+      const done = (ok: boolean, msg: string) => {
+        status.textContent = msg;
+        status.dataset.state = ok ? 'ok' : 'error';
+        button.disabled = false;
+        script.remove();
+        delete (window as any)[cb];
+      };
+
+      (window as any)[cb] = (res: { result: string; msg: string }) => {
+        const ok = res.result === 'success';
+        // Mailchimp messages sometimes start with "0 - "; drop that and any markup.
+        const text = res.msg.replace(/^\d+ - /, '').replace(/<[^>]*>/g, '');
+        done(ok, ok ? "You're in. Check your inbox to confirm." : text);
+        if (ok) form.reset();
+      };
+
+      script.src = url.href;
+      script.onerror = () => done(false, 'Something went wrong. Please try again.');
+      button.disabled = true;
+      status.textContent = 'Signing you up…';
+      status.dataset.state = '';
+      document.body.append(script);
+    });
+  });
+</script>
+
+<style>
+  .newsletter {
+    text-align: center;
+  }
+
+  .lede {
+    margin-inline: auto;
+  }
+
+  .form {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 32rem;
+    margin: 0 auto;
+    padding: 0.4rem;
+    border: 1px solid color-mix(in srgb, var(--cream) 18%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 60%, transparent);
+    backdrop-filter: blur(8px);
+    transition: border-color 0.2s;
+  }
+
+  .form:focus-within {
+    border-color: var(--pink);
+  }
+
+  input[type='email'] {
+    flex: 1;
+    min-width: 0;
+    padding: 0 1.1rem;
+    border: 0;
+    background: none;
+    color: var(--cream);
+    font: inherit;
+    outline: none;
+  }
+
+  input::placeholder {
+    color: var(--muted);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .status {
+    min-height: 1.6em;
+    margin: 1rem 0 0;
+    font-size: 0.95rem;
+  }
+
+  .status[data-state='ok'] {
+    color: var(--teal);
+  }
+
+  .status[data-state='error'] {
+    color: var(--sun);
+  }
+
+  @media (max-width: 480px) {
+    .form {
+      flex-direction: column;
+      border-radius: var(--radius);
+    }
+
+    input[type='email'] {
+      padding: 0.9rem 1rem;
+    }
+  }
+</style>

@@ -1,0 +1,149 @@
+---
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  items: { src: ImageMetadata; alt: string; caption: string }[];
+}
+
+const { items } = Astro.props;
+
+// Larger versions for the lightbox, generated at build time.
+const full = await Promise.all(items.map((item) => getImage({ src: item.src, width: 1800, format: 'webp' })));
+---
+
+<ul class="gallery">
+  {
+    items.map((item, i) => (
+      <li class="reveal" style={`animation-delay:${i * 60}ms`}>
+        <button type="button" data-full={full[i].src} data-alt={item.alt} aria-label={`Enlarge: ${item.caption}`}>
+          <Image src={item.src} alt={item.alt} widths={[400, 700, 1000]} sizes="(max-width: 700px) 100vw, 50vw" />
+        </button>
+        <span class="caption">{item.caption}</span>
+      </li>
+    ))
+  }
+</ul>
+
+<dialog class="lightbox" data-lightbox>
+  <img alt="" />
+  <form method="dialog">
+    <button class="close" aria-label="Close">&times;</button>
+  </form>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]')!;
+  const img = dialog.querySelector('img')!;
+
+  document.querySelectorAll<HTMLButtonElement>('[data-full]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      img.src = btn.dataset.full!;
+      img.alt = btn.dataset.alt!;
+      dialog.showModal();
+    });
+  });
+
+  // Click on the backdrop closes it too.
+  dialog.addEventListener('click', (e) => e.target === dialog && dialog.close());
+</script>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1rem, 2.5vw, 2rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--ink-2);
+    cursor: zoom-in;
+  }
+
+  .gallery img {
+    width: 100%;
+    aspect-ratio: 11 / 10;
+    object-fit: cover;
+    transition: transform 0.7s var(--ease);
+  }
+
+  .gallery button:hover img {
+    transform: scale(1.05);
+  }
+
+  .caption {
+    display: block;
+    margin-top: 0.75rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .lightbox {
+    max-width: min(94vw, 1400px);
+    max-height: 92vh;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+
+  .lightbox::backdrop {
+    background: color-mix(in srgb, var(--ink) 92%, transparent);
+    backdrop-filter: blur(6px);
+  }
+
+  .lightbox[open] {
+    animation: zoom 0.35s var(--ease);
+  }
+
+  .lightbox img {
+    max-height: 92vh;
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .close {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  @keyframes zoom {
+    from {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .gallery {
+      grid-template-columns: 1fr;
+    }
+
+    .close {
+      top: -3.25rem;
+      right: 0;
+    }
+  }
+</style>
